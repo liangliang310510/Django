@@ -10,7 +10,7 @@ python3.5 + django1.8.2 + mysql + celery + smtp + haystack + ajax + cookie + ses
 #### 安装教程
 
 1. 新建一个虚拟环境（确保是python3.5以上），名字任取，进入到虚拟环境下
-2. 在虚拟环境中运行pip install requirements.txt来安装需要的库
+2. 在虚拟环境中运行pip install -r requirements.txt来安装需要的库
 
 #### 使用说明
 
