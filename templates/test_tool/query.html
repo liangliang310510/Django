@@ -1,0 +1,17 @@
+<html>
+<head>
+    <title>全文检索</title>
+</head>
+<body>
+{#search:为Haystack指定的搜索url#}
+{#1、method:get#}
+{#2、url中使用search/结尾#}
+{#3、查询内容使用q为key#}
+{{ data }}
+<form method='get' action="/tool/search/" target="_blank">
+    <input type="text" name="q">
+    <br>
+    <input type="submit" value="查询">
+</form>
+</body>
+</html>

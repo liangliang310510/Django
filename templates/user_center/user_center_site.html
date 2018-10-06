@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block head %}
+<script>
+    function deleteAddress(addressId) {
+        var result = confirm('是否要删除？');
+        if(result){
+            location.href = '/user/address_delete/?address_id='+addressId;
+        }
+    }
+
+    function defAddress(addressId) {
+        location.href='/user/address_default'+addressId+'/';
+    }
+</script>
+{% endblock %}
+   {% block middle %}
+    <div class="main_con clearfix">
+        <div class="left_menu_con clearfix">
+            <h3>用户中心</h3>
+            <ul>
+                <li><a href="user_center_info.html">· 个人信息</a></li>
+                <li><a href="user_center_order.html">· 全部订单</a></li>
+                <li><a href="user_center_site.html" class="active">· 收货地址</a></li>
+            </UL>
+        </div>
+        <div class="right_content clearfix">
+            <h3 class="common_title2">收货地址 <a href="/user/address_edit/" style="vertical-align:middle;">【添加】</a></h3>
+            <span style="color: red;">{{ msg }}</span>
+            {% for item in list %}
+                <div class="site_con">
+                    <dl>
+                        <dd>{{ item.address }} {{ item.detail }} （{{ item.realname }} 收） {{ item.phone }}</dd>
+                        <dd>
+                            <div>
+{#                                这个模块用于设置默认地址#}
+                                {% if item.def_address %}
+                                    <input type="checkbox" checked="checked" style="vertical-align:middle;"
+                                           onclick="defAddress({{ item.id }})"/>
+                                {% else %}
+                                    <input type="checkbox" style="vertical-align:middle;"
+                                           onclick="defAddress({{ item.id }})"/>
+                                {% endif %}
+                                <span style="vertical-align:middle;">默认地址</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{#                                这里通过传递一个参数给address_edit函数#}
+                                <a href="/user/address_edit/?id={{ item.id }}" style="vertical-align:middle;">编辑</a>&nbsp;&nbsp;
+{#                                <a href="/user/address_delete_{{ item.id }}/" style="vertical-align:middle;">删除</a>#}
+                                <a onclick="deleteAddress({{ item.id }})" href="#" style="vertical-align: middle;">删除</a>
+                            </div>
+                        </dd>
+                    </dl>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+{% endblock %}
+
+

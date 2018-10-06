@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <script>
+    function setOption(target, data) {
+        target.empty().append('<option value="0">-- 请选择 --</option>')
+        $.each(data.list, function (index, item) {
+            target.append('<option value="'+item.id+'">'+item.name+'</option>')
+        })
+    }
+
+
+    $(function () {
+        $.get('/user/area/', function (data) {
+            province = $('#provice');
+        })
+    });
+
+    $(function () {  //html界面的所有代码都加在完成之后才执行
+        //获取省列表
+        $.get('/user/area/', function (data) {
+            var province = $('#province');
+            setOption(province, data)
+        });
+
+
+        //省下拉框内容变动，获取市信息
+        $('#province').change(function () {
+            var val = $(this).val();
+            if (val != '0'){
+                $.get('/user/area/',{'area_id':val},function (data) {  //注：这里的{'area_id':val}是回传给/user/area/的数据，用于获取选中的省的市区数据
+                    var city = $('#city');
+                    setOption(city, data);
+                })
+            }
+        });
+
+        $('#city').change(function () {
+            var val = $(this).val();
+            if (val != '0'){
+                $.get('/user/area/',{'area_id':val},function (data) {
+                    var area = $('#area');
+                    setOption(area, data);
+                })
+            }
+        })
+
+
+        {#        界面处理#}
+        var realname_error = false;
+        var detail_error = false;
+        var phone_error = false;
+
+        $('#realname').blur(function () {
+            val = $(this).val();
+            if(val.length == 0){
+                realname_error = true;
+                $('#realname_error').text('请填写真实姓名').show()
+            }else{
+                realname_error = false;
+                $('#realname_error').hide();
+            }
+        });
+
+        $('#detail').blur(function () {
+            val = $(this).val();
+            if(val.length == 0){
+                detail_error = true;
+                $('#detail_error').text('请填写详细地址').show()
+            }else{
+                detail_error = false;
+                $('#detail_error').hide();
+            }
+        });
+
+        $('#phone').blur(function () {
+            val = $(this).val();
+            var pattern = /^(((13[0-9]{1})|(14[0-9]{1})|(17[0]{1})|(15[0-3]{1})|(15[5-9]{1})|(18[0-9]{1}))+\d{8})$/;
+            if( !pattern.test(val) ){
+                phone_error = true;
+                $('#phone_error').text('请填写真实的电话号码').show()
+            }else{
+                phone_error = false;
+                $('#phone_error').hide();
+            }
+        })
+    });
+
+
+
+    $('form').submit(function () {
+        $('#realname').blur();
+        $('#detail').blur();
+        $('#phone').blur();
+
+        var province = $('#province').val();
+        var city = $('#city').val();
+        var area = $('#area').val();
+
+        var area_error = (province == 0 || city == 0 || area==0);
+
+        if(area_error){
+            alert('请填写地址信息');
+        }
+        return !realname_error && !detail_error&&!phone_error&&!area_error;
+    })
+
+    </script>
+
+{% endblock %}
+
+{% block middle %}
+
+
+    <div class="main_con clearfix">
+        <div class="left_menu_con clearfix">
+            <h3>用户中心</h3>
+            <ul>
+                <li><a href="/user/address/">· 个人信息</a></li>
+                <li><a href="user_center_order.html">· 全部订单</a></li>
+                <li><a href="#" class="active">· 收货地址</a></li>
+            </ul>
+        </div>
+        <div class="right_content clearfix">
+            <h3 class="common_title2">编辑地址</h3>
+            <div class="site_con">
+                <form method="post" action="/user/address_edit_handle/">
+                    {% csrf_token %}
+                    {#                    如果是编辑地址就需要地址编号#}
+                    <input type="hidden" name="address_id" value="{{ address.id }}">
+                    <div class="form_group">
+                        <label>收件人：</label>
+                        <input type="text" id="realname" name="realname" value="{{ address.realname }}" placeholder="请输入真实姓名">
+                        <div id="realname_error" hidden="hidden" style="color:red;margin-left: 50px;">输入错误</div>
+                    </div>
+                    <div class="form_group">
+                        <label>地址：</label>
+                        <select id="province" name="province">
+                            <option value="0">-- 请选择 --</option>
+                        </select>&nbsp;
+                        <select id="city" name="city">
+                            <option value="0">-- 请选择 --</option>
+                        </select>&nbsp;
+                        <select id="area" name="area">
+                            <option value="0">-- 请选择 --</option>
+                        </select>
+                    </div>
+                    <div class="form_group form_group2">
+                        <label>详细地址：</label>
+                        <textarea class="site_area" id="detail" name="detail">{{ address.detail }}</textarea>
+                        <div id="detail_error" hidden="hidden" style="color:red;margin-left: 100px;">输入错误</div>
+                    </div>
+
+                    <div class="form_group">
+                        <label>手机：</label>
+                        <input type="text" id="phone" name="phone" value="{{ address.phone }}">
+                        <div id="phone_error" hidden="hidden" style="color:red;">输入错误</div>
+                    </div>
+                    <input type="submit" value="提交" class="info_submit">
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

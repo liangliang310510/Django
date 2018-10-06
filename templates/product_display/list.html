@@ -1,0 +1,111 @@
+{% extends 'product_display/product_base.html' %}
+{% block head %}
+    <link rel="stylesheet" href="/static/css/jquery.pagination.css"/>
+    <script src="/static/js/jquery.pagination.min.js"></script>
+
+    <style>
+        .box {
+            width: 800px;
+            margin: 100px auto;
+            height: 34px;
+        }
+
+        .page {
+            width: 600px;
+            height: 32px;
+            text-align: center;
+            font-size: 0;
+            margin: 30px auto;
+        }
+    </style>
+{% endblock %}
+
+{% block middle %}
+    {% block content %}
+        <div class="main_wrap clearfix">
+            <div class="l_wrap fl clearfix">
+                <div class="new_goods">
+                    <h3>新品推荐</h3>
+                    <ul>
+                        {% for item in new_goods %}
+                            <li>
+                                <a href="/detail_{{ item.id }}"><img src="/static/{{ item.pic }}"></a>
+                                <h4><a href="#">{{ item.name }}</a></h4>
+                                <div class="prize">￥{{ item.price }}</div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="r_wrap fr clearfix">
+                <div class="sort_bar">
+                    <a href="/product_list_{{ current_type.id }}_1/?order_by=-id" {% if order_by == '-id' %}
+                       class="active" {% endif %}>默认</a>
+                    <a href="/product_list_{{ current_type.id }}_1/?order_by=-price" {% if order_by == '-price' %}
+                       class="active" {% endif %}>价格</a>
+                    <a href="/product_list_{{ current_type.id }}_1/?order_by=-click" {% if order_by == '-click' %}
+                       class="active" {% endif %}>人气</a>
+                </div>
+                <ul class="goods_type_list clearfix">
+                    {% for item in page %}
+                        <li>
+                            <a href="/detail_{{ item.id }}/"><img src="/static/{{ item.pic }}"></a>
+                            <h4><a href="detail.html">{{ item.name }}</a></h4>
+                            <div class="operate">
+                                <span class="prize">￥{{ item.price }}</span>
+                                <span class="unit">{{ item.price }}/{{ item.unit }}</span>
+                                {#                        注：如果在href中添加url的话就会变成HTTPRESPONSE，会发生界面跳转，这对于购物车模块来说是不需要的，所以只用通过onclick函数来实现一个ajax异步请求#}
+                                <a href="#" class="add_goods" title="加入购物车" onclick="addGoods({{ item.id }})"></a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    {#                将点击的物品加入到cart数据库中#}
+                    <script>
+                        function addGoods(id) {
+                            // 判断用户是否登录
+                            $.get('/user/is_login/', function (data) {
+                                // {'isLogin':boolean}
+                                if (data.isLogin) {
+                                    // 添加购物项到数据库
+                                    $.get('/cart/add_goods/', {'gid': id}, function (data) {  //将商品的id回传给views函数
+                                        if (data.isAdd) {
+                                            $('#show_count').html(data.count);
+                                        } else {
+                                            alter('添加商品失败，请重新添加！');
+                                        }
+                                    })
+                                } else {
+                                    location.href = '/user/login/'
+                                }
+                            })
+                        }
+                    </script>
+
+                </ul>
+
+                <div class="box">
+                    <div id="pagination" class="page"></div>
+                </div>
+
+                <script>
+                    $("#pagination").pagination({
+                        currentPage: {{ page.number }},// 当前页数
+                        totalPage: {{ page.paginator.num_pages }},// 总页数
+                        isShow: false,// 是否显示首尾页
+                        count: 5,// 显示个数
+                        homePageText: "首页",// 首页文本
+                        endPageText: "尾页",// 尾页文本
+                        prevPageText: "上一页",// 上一页文本
+                        nextPageText: "下一页",// 下一页文本
+                        callback: function (current) {
+                            // 回调,current(当前页数)
+                            location.href = '/product_list_{{ current_type.id }}_' + current + '/?order_by={{ order_by }}';
+                        }
+                    });
+                </script>
+            </div>
+        </div>
+    {% endblock %}
+{% endblock %}
+

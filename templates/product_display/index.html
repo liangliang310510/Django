@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block head %}
+	<script type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="/static/js/slide.js"></script>
+{% endblock %}
+
+{% block middle %}
+    {#获取分类信息并展示#}
+    {#获取每个分类信息对应的商品数据#}
+
+    <div class="navbar_con">
+        <div class="navbar">
+            <h1 class="fl">全部商品分类</h1>
+            <ul class="navlist fl">
+                <li><a href="">首页</a></li>
+                <li class="interval">|</li>
+                <li><a href="">手机生鲜</a></li>
+                <li class="interval">|</li>
+                <li><a href="">抽奖</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="center_con clearfix">
+        <ul class="subnav fl">
+            {% for type in types %}
+                <li><a href="#model0{{ forloop.counter }}" class="type{{ type.id }}">{{ type.title }}</a></li>
+            {% endfor %}
+        </ul>
+        <div class="slide fl">
+            <ul class="slide_pics">
+                <li><img src="/static/images/slide.jpg" alt="幻灯片"></li>
+                <li><img src="/static/images/slide02.jpg" alt="幻灯片"></li>
+                <li><img src="/static/images/slide03.jpg" alt="幻灯片"></li>
+                <li><img src="/static/images/slide04.jpg" alt="幻灯片"></li>
+            </ul>
+            <div class="prev"></div>
+            <div class="next"></div>
+            <ul class="points"></ul>
+        </div>
+        <div class="adv fl">
+            <a href="#"><img src="/static/images/adv01.jpg"></a>
+            <a href="#"><img src="/static/images/adv02.jpg"></a>
+        </div>
+    </div>
+    {% for item in type_goods %}
+        <div class="list_model">
+            <div class="list_title clearfix">
+                <h3 class="fl" id="model0{{ forloop.counter }}">{{ item.type.title }}</h3>
+                <div class="subtitle fl">
+                    <span>|</span>
+{#                    id通过这里/detail_{{ hot.id }} 传递给views中的detail函数#}
+                    {% for hot in item.hot_goods %}
+                        <a href="/detail_{{ hot.id }}/">{{ hot.name }}</a>
+                    {% endfor %}
+                </div>
+{#                查看更多时首先要看得是首页信息#}
+                <a href="/product_list_{{ item.type.id }}_1/" class="goods_more fr" id="fruit_more">查看更多 ></a>
+            </div>
+
+            <div class="goods_con clearfix">
+                <div class="goods_banner fl"><img src="/static/images/banner0{{ forloop.counter }}.jpg"></div>
+                <ul class="goods_list fl">
+                    {% for new in item.new_goods %}
+                        <li>
+                            <h4><a href="/detail_{{ new.id }}/">{{ new.name }}</a></h4>
+                            <a href="/detail_{{ new.id }}/"><img src="/static/{{ new.pic }}"></a>
+                            <div class="prize">¥{{ new.price }}</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

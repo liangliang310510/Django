@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block head %}
+    <link rel="stylesheet" href="/static/css/jquery.pagination.css"/>
+    <script src="/static/js/jquery.pagination.min.js"></script>
+    <style>
+        .box {
+            width: 800px;
+            margin: 100px auto;
+            height: 34px;
+        }
+
+        .page {
+            width: 600px;
+            height: 32px;
+            text-align: center;
+            font-size: 0;
+            margin: 30px auto;
+        }
+    </style>
+{% endblock %}
+
+{% block middle %}
+
+	<div class="main_con clearfix">
+		<div class="left_menu_con clearfix">
+			<h3>用户中心</h3>
+			<ul>
+				<li><a href="/user/">· 个人信息</a></li>
+				<li><a href="/user/order/" class="active">· 全部订单</a></li>
+				<li><a href="/user/address/">· 收货地址</a></li>
+			</ul>
+		</div>
+		<div class="right_content clearfix">
+				<h3 class="common_title2">全部订单</h3>
+
+            {% for order in page %}
+				<ul class="order_list_th w978 clearfix">
+					<li class="col01">{{ order.orderdate }}</li>
+					<li class="col02">订单号：{{ order.id }}</li>
+					<li class="col02 stress">{% if order.status == 0 %}未支付{% else %}已支付{% endif %}</li>
+				</ul>
+
+				<table class="order_list_table w980">
+					<tbody>
+						<tr>
+							<td width="55%">
+                                {% for detail in order.orderdetail_set.all %}
+                                    <ul class="order_goods_list clearfix">
+                                        <li class="col01"><img src="/static/{{ detail.goods.pic }}"></li>
+                                        <li class="col02">{{ detail.goods.name|truncatechars:10 }}<em>{{ detail.goods.price }}元/{{ detail.goods.unit }}</em></li>
+                                        <li class="col03">{{ detail.count }}</li>
+                                        <li class="col04">{{ detail.price }}元</li>
+                                    </ul>
+								{% endfor %}
+							</td>
+							<td width="15%">{{ order.total }}元</td>
+							<td width="15%">待付款</td>
+							<td width="15%"><a href="#" class="oper_btn">去付款</a></td>
+						</tr>
+					</tbody>
+				</table>
+            {% endfor %}
+
+            <div class="box">
+                <div id="pagination" class="page"></div>
+            </div>
+
+            <script>
+                $("#pagination").pagination({
+                    currentPage: {{ page.number }},// 当前页数
+                    totalPage: {{ page.paginator.num_pages }},// 总页数
+                    isShow: true,// 是否显示首尾页
+                    count: 5,// 显示个数
+                    homePageText: "首页",// 首页文本
+                    endPageText: "尾页",// 尾页文本
+                    prevPageText: "上一页",// 上一页文本
+                    nextPageText: "下一页",// 下一页文本
+                    callback: function (current) {
+                        // 回调,current(当前页数)
+                        location.href = '/user/order/?current=' + current;
+                    }
+                });
+            </script>
+		</div>
+	</div>
+
+{% endblock %}
